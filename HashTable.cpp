@@ -144,7 +144,7 @@ unsigned int HashTable::hash(int key) {
  */
 void HashTable::Insert(Bid bid) {
     // create the key for the given bid
-    unsigned int key = hash(stoi(bid.bidId));
+    unsigned int key = hash(atoi(bid.bidId));
     // retrieve node using key
     Node* newNode = new Node(bid, key);
     // if no entry found for the key
@@ -198,7 +198,7 @@ void HashTable::PrintAll() {
 void HashTable::Remove(string bidId) {
     // FIXME (7): Implement logic to remove a bid
     // set key equal to hash atoi bidID cstring
-    unsigned int key = hash(stoi(bidId));
+    unsigned int key = hash(atoi(bidId));
     Node* current = &nodes[key];
     Node* previous = nullptr;
 
@@ -229,7 +229,7 @@ Bid HashTable::Search(string bidId) {
     // FIXME (8): Implement logic to search for and return a bid
 
     // create the key for the given bid
-    unsigned int key = hash(stoi(bidId));
+    unsigned int key = hash(atoi(bidId));
     Node* current = &nodes[key];
     // if entry found for the key
     while (current != nullptr) {
