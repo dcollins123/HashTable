@@ -162,8 +162,7 @@ void HashTable::Insert(Bid bid) {
         // add new newNode to end
         current->next = newNode;
     }
-           
-          // else find the next open node
+         // else find the next open node
 }
 
 /**
