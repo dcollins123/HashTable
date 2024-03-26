@@ -144,25 +144,30 @@ unsigned int HashTable::hash(int key) {
  */
 void HashTable::Insert(Bid bid) {
     // create the key for the given bid
-    unsigned int key = hash(atoi(bid.bidId));
+    unsigned int key = hash(atoi(bid.bidId.c_str()));
     // retrieve node using key
-    Node* newNode = new Node(bid, key);
+    Node* oldNode = &nodes[key];
     // if no entry found for the key
-    if (nodes[key].key == UINT_MAX) {
+    if (oldNode == nullptr) {
         // assign this node to the key position
-        nodes[key] = *newNode;
+        nodes[key] = Node(bid, key);
     }
     // else if node is not used
-    else {
-        Node* current = &nodes[key];
-        // assing old node key to UNIT_MAX, set to key, set old node to bid and old node next to null pointer
-        while (current->next != nullptr) {
-            current = current->next;
-        }
-        // add new newNode to end
-        current->next = newNode;
+    else if (oldNode->key == UINT_MAX) {
+        // assign old node key to UINT_MAX, set to key, set old node to bid and old node next to null pointer
+        oldNode->key = key;
+        oldNode->bid = bid;
+        oldNode->next = nullptr;
     }
-         // else find the next open node
+    // else find the next open node
+    else {
+        // add new newNode to end
+        while (oldNode->next != nullptr) {
+            oldNode = oldNode->next;
+        }
+        oldNode->next = new Node(bid, key);
+    }
+
 }
 
 /**
@@ -198,7 +203,7 @@ void HashTable::PrintAll() {
 void HashTable::Remove(string bidId) {
     // FIXME (7): Implement logic to remove a bid
     // set key equal to hash atoi bidID cstring
-    unsigned int key = hash(atoi(bidId));
+    unsigned int key = hash(atoi(bidId.c_str()));
     Node* current = &nodes[key];
     Node* previous = nullptr;
 
@@ -229,7 +234,7 @@ Bid HashTable::Search(string bidId) {
     // FIXME (8): Implement logic to search for and return a bid
 
     // create the key for the given bid
-    unsigned int key = hash(atoi(bidId));
+    unsigned int key = hash(atoi(bidId.c_str()));
     Node* current = &nodes[key];
     // if entry found for the key
     while (current != nullptr) {
