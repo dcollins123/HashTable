@@ -105,7 +105,6 @@ HashTable::HashTable(unsigned int size) {
     // resize nodes size
 }
 
-
 /**
  * Destructor
  */
