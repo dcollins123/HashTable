@@ -235,27 +235,23 @@ Bid HashTable::Search(string bidId) {
     Bid bid;
 
     // FIXME (8): Implement logic to search for and return a bid
-
     // create the key for the given bid
     unsigned int key = hash(atoi(bidId.c_str()));
     Node* node = &(nodes[key]);
     // if entry found for the key
     if (node->key != UINT_MAX) {
+        // while node not equal to nullptr
         while (node != nullptr) {
             if (node->bid.bidId == bidId) {
+                //return node bid
                 return node->bid;
             }
+            //node is equal to next node
             node = node->next;
         }
     }
-         //return node bid
-
-    // if no entry found for the key
-      // return bid
-    // while node not equal to nullptr
-        // if the current node matches, return it
-        //node is equal to next node
-
+                      
+    // return bid
     return bid;
 }
 
