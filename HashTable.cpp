@@ -103,18 +103,20 @@ HashTable::HashTable() {
 HashTable::HashTable(unsigned int size) {
     // invoke local tableSize to size with this->
     // resize nodes size
+    this->tableSize = size;
+    nodes.resize(size);
+
 }
 
 /**
  * Destructor
  */
 HashTable::~HashTable() {
-    for (auto& node : nodes) {
-        Node* current = node.next;
-        while (current != nullptr) {
-            Node* temp = current;
-            current = current->next;
-            // erase nodes beginning
+    for (int i = 0; i < tableSize; ++i) {
+        Node* node = nodes[i].next;
+        while (node != nullptr) {
+            Node* temp = node;
+            node = node->next;
             delete temp;
         }
     }
@@ -146,25 +148,20 @@ void HashTable::Insert(Bid bid) {
     unsigned int key = hash(atoi(bid.bidId.c_str()));
     // retrieve node using key
     Node* oldNode = &nodes[key];
+    Node* newNode = new Node(bid, key);
     // if no entry found for the key
-    if (oldNode == nullptr) {
+    if (oldNode->key == UINT_MAX) {
         // assign this node to the key position
-        nodes[key] = Node(bid, key);
+        *oldNode = *newNode;
     }
     // else if node is not used
-    else if (oldNode->key == UINT_MAX) {
-        // assign old node key to UINT_MAX, set to key, set old node to bid and old node next to null pointer
-        oldNode->key = key;
-        oldNode->bid = bid;
-        oldNode->next = nullptr;
-    }
-    // else find the next open node
     else {
-        // add new newNode to end
+        // assign old node key to UINT_MAX, set to key, set old node to bid and old node next to null pointer
         while (oldNode->next != nullptr) {
             oldNode = oldNode->next;
         }
-        oldNode->next = new Node(bid, key);
+
+        oldNode->next = newNode;
     }
 
 }
@@ -175,19 +172,17 @@ void HashTable::Insert(Bid bid) {
 void HashTable::PrintAll() {
     // FIXME (6): Implement logic to print all bids
     // for node begin to end iterate
-    for (auto& node : nodes) {
+    for (unsigned int i = 0; i < tableSize; ++i) {
+        Node node = nodes[i];
         //   if key not equal to UINT_MAx
         if (node.key != UINT_MAX) {
             // output key, bidID, title, amount and fund
             cout << "Key " << node.key << ": " << node.bid.bidId << " | " << node.bid.title << " | " << node.bid.amount << " | " << node.bid.fund << endl;
-            // node is equal to next iter
-            Node* current = node.next;
             // while node not equal to nullptr
-            while (current != nullptr) {
+            while (node.next != nullptr) {
+                node = *(node.next);
                 // output key, bidID, title, amount and fund
-                cout << current->key << ": " << current->bid.bidId << " | " << current->bid.title << " | " << current->bid.amount << " | " << current->bid.fund << endl;
-                // node is equal to next node
-                current = current->next;
+                cout << " -> Key " << node.key << ": " << node.bid.bidId << " | " << node.bid.title << " | " << node.bid.amount << " | " << node.bid.fund << endl;
             }
         }
     }
@@ -203,23 +198,32 @@ void HashTable::Remove(string bidId) {
     // FIXME (7): Implement logic to remove a bid
     // set key equal to hash atoi bidID cstring
     unsigned int key = hash(atoi(bidId.c_str()));
-    Node* current = &nodes[key];
+    Node* node = &nodes[key];
     Node* previous = nullptr;
 
-    while (current != nullptr && current->bid.bidId != bidId) {
-        previous = current;
-        current = current->next;
+    if (node->key == UINT_MAX) return;
+
+    while (node != nullptr && node->bid.bidId != bidId) {
+        previous = node;
+        node = node->next;
     }
 
-    if (current != nullptr) {
-        if (previous != nullptr) {
-            previous->next = current->next;
+    if (node == nullptr) return;
+
+    if (previous != nullptr) {
+        previous->next = node->next;
+    }
+    else {
+        if (node->next == nullptr) {
+            node[key] = Node();
         }
         else {
-            nodes[key] = *current->next;
+            nodes[key] = *(node->next);
         }
-        delete current;
     }
+
+    delete node;
+    
 }
 
 /**
@@ -234,13 +238,15 @@ Bid HashTable::Search(string bidId) {
 
     // create the key for the given bid
     unsigned int key = hash(atoi(bidId.c_str()));
-    Node* current = &nodes[key];
+    Node* node = &(nodes[key]);
     // if entry found for the key
-    while (current != nullptr) {
-        if (current->bid.bidId == bidId) {
-            return current->bid;
+    if (node->key != UINT_MAX) {
+        while (node != nullptr) {
+            if (node->bid.bidId == bidId) {
+                return node->bid;
+            }
+            node = node->next;
         }
-        current = current->next;
     }
          //return node bid
 
